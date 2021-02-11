@@ -6,7 +6,46 @@ from rango.forms import CategoryForm
 from rango.forms import PageForm
 from django.shortcuts import redirect
 from django.shortcuts import reverse
+from rango.forms import UserForm, UserProfileForm
 
+def register(request):
+    #tells us whether reg was successful, False for now
+    registered=False
+    
+    #process form data
+    if request.method == 'POST':
+        #Grab information from the raw form
+        user_form=UserForm(request.POST)
+        profile_form=UserProfileForm(request.POST)
+        
+        if user_form.is_valid() and profile_form.is_valid():
+            user=user_form.save()
+            
+            #hash password
+            user.set_password(user.password)
+            user.save()
+            
+            #set commit to false to avoid integrity problems for now, otherwise it will save and mess up the database foreignkeys
+            profile=profile_form.save(commit=False)
+            #add user reference
+            profile.user=user
+            
+            #get pfp from input form and put into UserProfile model
+            if 'picture' in request.FILES:
+                profile.picture=request.FILES['picture']
+            
+            #safe to save now
+            profile.save()
+            registered=True
+        else:
+            #print errors to terminal
+            print(user_form.errors, profile_form.errors)
+    else:
+        #not a post so render blank form for user input
+        user_form=UserForm()
+        profile_form=UserProfileForm()
+    return render(request,'rango/register.html',context={'user_form':user_form,'profile_form':profile_form,'registered':registered})
+    
 def add_page(request,category_name_slug):
     try:
         category=Category.objects.get(slug=category_name_slug)

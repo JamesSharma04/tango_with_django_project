@@ -1,6 +1,19 @@
 from django.db import models
 from django.template.defaultfilters import slugify
-# Create your models here.
+from django.contrib.auth.models import User 
+
+class UserProfile(models.Model):
+    #Link UserProfile to a User model instance
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    
+    #Include Additional attributes to complete the User's profile
+    website = models.URLField(blank=True)
+    picture=models.ImageField(upload_to='profile_images', blank=True)
+    
+    #Return a meaningful value
+    def __str__(self):
+        return self.user.username
+
 
 class Category(models.Model):
     NAME_MAX_LENGTH=128
