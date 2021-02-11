@@ -2,7 +2,62 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from rango.models import Category
 from rango.models import Page
+from rango.forms import CategoryForm
+from rango.forms import PageForm
+from django.shortcuts import redirect
+from django.shortcuts import reverse
 
+def add_page(request,category_name_slug):
+    try:
+        category=Category.objects.get(slug=category_name_slug)
+    except Category.DoesNotExist:
+        category=None
+        
+    #if it doesnt exist, go back to the homepage
+    if category is None:
+        return redirect('/rango/')
+        
+    form = PageForm()
+    
+    #checks if user submitted data via the form
+    if request.method=='POST':
+        form = PageForm(request.POST)
+        
+        if form.is_valid():
+            if category:
+                page=form.save(commit=False)
+                page.category=category
+                page.views=0
+                page.save()
+                
+                #send user to the show_category view, reverse() looks up URLs in views.py (rango:show_category
+                #second parameter makes sure complete URL can be formulaed to send to redirect() method
+                return redirect(reverse('rango:show_category',kwargs={'category_name_slug':category_name_slug}))
+        else:
+            #error print
+            print(form.errors)
+    
+    context_dict={'form': form, 'category':category}            
+    #handles errors
+    return render(request, 'rango/add_page.html', context=context_dict)
+
+def add_category(request):
+    form = CategoryForm()
+    
+    #checks if user submitted data via the form
+    if request.method=='POST':
+        form = CategoryForm(request.POST)
+        
+        if form.is_valid():
+            #save new category to db
+            form.save(commit=True)
+            #redirect to index view for now
+            return redirect('/rango/')
+        else:
+            #error print
+            print(form.errors)
+    #handles errors
+    return render(request, 'rango/add_category.html', {'form': form})
 def show_category(request, category_name_slug):
     # Create a context dictionary which we can pass to the template rendering engine 
     context_dict = {}
@@ -35,12 +90,17 @@ def index(request):
     # Retrieve the top 5 only -- or all if less than 5.
     # Place the list in our context_dict dictionary (with our boldmesage!) that will be passed to the template engine.
     category_list = Category.objects.order_by('-likes')[:5]
+    
+    page_list = Page.objects.order_by('-views')[:5]
+
 
     # Construct a dictionary to pass to the template engine as its context.
     # Note the key boldmessage matches to {{ boldmessage }} in the template!
     context_dict = {}
     context_dict['boldmessage'] = 'Crunchy, creamy, cookie, candy, cupcake!'
     context_dict['categories'] = category_list
+    
+    context_dict['pages'] = page_list
     
     # Return a rendered response to send to the client.
     # We make use of the shortcut function to make our lives easier.
