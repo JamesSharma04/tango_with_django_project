@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rango',
 ]
+SESSION_EXPIRE_AT_BROWSER_CLOSE=True
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -88,6 +89,8 @@ DATABASES = {
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
 
 LOGIN_URL = 'rango:login'
+
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
