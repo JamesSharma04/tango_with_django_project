@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rango',
+    'registration',
 ]
 SESSION_EXPIRE_AT_BROWSER_CLOSE=True
 
@@ -88,7 +89,7 @@ DATABASES = {
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
 
-LOGIN_URL = 'rango:login'
+
 
 
 
@@ -131,3 +132,9 @@ STATIC_URL = '/static/'
 
 MEDIA_ROOT = MEDIA_DIR
 MEDIA_URL = '/media/'
+
+#registration stuff
+REGISTRATION_OPEN=True
+REGISTRATION_AUTO_LOGIN=True
+LOGIN_REDIRECT_URL='rango:index'
+LOGIN_URL = 'auth_login'

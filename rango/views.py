@@ -36,18 +36,18 @@ def visitor_cookie_handler(request):
         request.session['last_visit']=last_visit_cookie
     request.session['visits']=visits
 
-
+'''
 @login_required
 def user_logout(request):
     logout(request)
     #Take the user back to the homepage.
     return redirect(reverse('rango:index'))
-
+'''
 
 @login_required
 def restricted(request):
     return render(request, 'rango/restricted.html')
-
+'''
 def user_login(request):
     if request.method=='POST':
         #get info frm user
@@ -106,7 +106,7 @@ def register(request):
         user_form=UserForm()
         profile_form=UserProfileForm()
     return render(request,'rango/register.html',context={'user_form':user_form,'profile_form':profile_form,'registered':registered})
-   
+'''   
 @login_required   
 def add_page(request,category_name_slug):
     try:
